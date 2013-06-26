@@ -1,0 +1,66 @@
+Introduction
+------------
+
+This is a script to check whether a Firefox instance is making any
+unencrypted requests that should have been rewritten by HTTPS Everywhere,
+by sniffing on a network interface and applying rules to observed HTTP
+requests to see if the requests should have been transformed.  If so,
+these requests may constitute leaks that are a result of bugs in
+HTTPS Everywhere, Firefox, or a rule.
+
+This script is based on Ondrej Mikle's https-everywhere-checker, and
+uses https-everywhere-checker's Python parser for HTTPS Everywhere
+rules.  Based on python-libxml2, this parser lets Python programs read
+HTTPS Everywhere XML ruleset files and apply the rulesets in them to
+URLs.
+
+https-everywhere-checker and this code are licensed under GNU GPL
+version 3.
+
+There are two reasons false positives may occur: (1) an HTTP request
+could be made by some software on the local system other than the copy
+of Firefox under test (this script can't distinguish), and (2) a site
+may redirect an HTTPS request back to HTTP, which will cause HTTPS
+Everywhere to avoid rewriting it again in order to avoid infinite
+redirection loops.  The latter case should be caught by parsing the
+text output from Firefox, but that functionality isn't implemented in
+this script yet.
+
+The alert() function tries to play a sound when a leak is encountered
+in order to draw attention to the problem promptly during interactive
+testing.  (There is still a slight lag because tshark doesn't always
+output sniffed URLs instantaneously, maybe because of I/O buffering.)i
+This could be changed to some other functionality for batch testing.
+
+
+Invocation
+----------
+
+Run with
+
+sudo python watch.py [profile_dir [interface]]
+
+where profile_dir is the top level of the Firefox profile directory from
+which rules should be extracted, and interface is the name of the interface
+to capture packets on.  The profile directory is normally the output of
+
+echo ~/.mozilla/firefox/*default
+
+but might be different if you're testing HTTPS Everywhere with a custom
+firefox profile.  If you don't specify a profile directory, the script
+will try to use your default Firefox profile, if it can find it.
+
+
+Prerequisites
+-------------
+
+. install tshark and python-libxml2 packages
+
+. install regex module on system  (via sudo python setup.py install)
+  ... available as tarball from http://pypi.python.org/pypi/regex
+                                (see bottom of page)
+
+. prefer to disable IPv6 tunnels, because IPv6 packets sent over the tunnel
+  won't be captured as TCP packets on the physical network interface!
+  (this is independent of whether the tunnel is encrypted -- it still
+  encapsulates them so that they no longer appear as TCP)
