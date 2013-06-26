@@ -64,3 +64,10 @@ Prerequisites
   won't be captured as TCP packets on the physical network interface!
   (this is independent of whether the tunnel is encrypted -- it still
   encapsulates them so that they no longer appear as TCP)
+
+
+Credits
+-------
+
+* Ondrej Mikle
+* Seth Schoen
