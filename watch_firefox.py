@@ -2,6 +2,7 @@
 
 import subprocess
 import os
+import threading
 
 class Firefox:
 
@@ -15,6 +16,7 @@ class Firefox:
         self.p = subprocess.Popen(['firefox', '-no-remote', '-P', self.profile], stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
         self.flagged_urls = []
+        self.lock = threading.Lock()
 
     def log_process(self):
         """generator that returns stdout line by line as long as p is running"""
@@ -32,7 +34,9 @@ class Firefox:
                 url_flag = 1
             else:
                 if url_flag == 1:
-                        self.flagged_urls.append(line)
+                    self.lock.acquire()
+                    self.flagged_urls.append(line.strip())
+                    self.lock.release()
                 url_flag = 0
 
     def found_redirect(self, url):

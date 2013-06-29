@@ -66,6 +66,7 @@ def find_unapplied_rules():
     theUrls = sniffedUrls(interface)
     for plainUrl in theUrls:
         try:
+            ff.lock.acquire()
             ruleMatch = trie.transformUrl(plainUrl)
             transformedUrl = ruleMatch.url
             if plainUrl == transformedUrl:
@@ -75,15 +76,14 @@ def find_unapplied_rules():
             else:
                 alert()
                 print "BAD: %s should have been transformed to %s" % (plainUrl, transformedUrl)
-            print 'Found redirect loops in: %s' % ff.flagged_urls
-            ff.clear_urls()
         except Exception, e:
             sys.stderr.write("%s\n" % e)
+        finally:
+            ff.lock.release()
 
 # start a Firefox instance with the given profile
 ff = Firefox(profiledir)
 t1 = threading.Thread(target=ff.get_urls)
 t2 = threading.Thread(target=find_unapplied_rules)
 t1.start()
-print 'starting second thread'
 t2.start()
