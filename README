@@ -26,10 +26,14 @@ redirection loops.  The latter case should be caught by parsing the
 text output from Firefox, but that functionality isn't implemented in
 this script yet.
 
+[Edit (7/28/13): I've tried to fix both of these hackishly. (1) is
+addressed by matching "Firefox" in the http.user_agent field. (2) has
+been implemented as suggested but not tested extensively.]
+
 The alert() function tries to play a sound when a leak is encountered
 in order to draw attention to the problem promptly during interactive
 testing.  (There is still a slight lag because tshark doesn't always
-output sniffed URLs instantaneously, maybe because of I/O buffering.)i
+output sniffed URLs instantaneously, maybe because of I/O buffering.)
 This could be changed to some other functionality for batch testing.
 
 
@@ -71,3 +75,4 @@ Credits
 
 * Ondrej Mikle
 * Seth Schoen
+* Yan Zhu
