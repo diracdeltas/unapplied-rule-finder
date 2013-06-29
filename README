@@ -27,8 +27,10 @@ text output from Firefox, but that functionality isn't implemented in
 this script yet.
 
 [Edit (7/28/13): I've tried to fix both of these hackishly. (1) is
-addressed by matching "Firefox" in the http.user_agent field. (2) has
-been implemented as suggested but not tested extensively.]
+addressed by matching "Firefox" in the http.user_agent field, which
+will fail to work correctly if there are multiple instances of
+Firefox running under different profiles. (2) has been implemented 
+as suggested but not tested extensively.]
 
 The alert() function tries to play a sound when a leak is encountered
 in order to draw attention to the problem promptly during interactive
@@ -53,6 +55,11 @@ echo ~/.mozilla/firefox/*default
 but might be different if you're testing HTTPS Everywhere with a custom
 firefox profile.  If you don't specify a profile directory, the script
 will try to use your default Firefox profile, if it can find it.
+
+Note that this will start a new instance of Firefox with the given
+profile. The script will show HTTP requests from ALL running Firefox
+instances, but it will only detect redirect loops for the instance
+that it started. 
 
 
 Prerequisites
