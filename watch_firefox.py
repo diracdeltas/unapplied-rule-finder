@@ -3,6 +3,7 @@
 import subprocess
 import os
 import threading
+from collections import OrderedDict
 
 def clean_url(url):
     """Remove whitespace, ignore page anchors"""
@@ -20,7 +21,7 @@ class Firefox:
             self.profile = fext.lstrip('.')
         self.p = subprocess.Popen(['firefox', '-no-remote', '-P', self.profile], stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
-        self.flagged_urls = []
+        self.flagged_urls = OrderedDict()
         self.lock = threading.Lock()
 
     def log_process(self):
@@ -40,18 +41,19 @@ class Firefox:
             else:
                 if url_flag == 1:
                     self.lock.acquire()
-                    self.flagged_urls.append(clean_url(line))
+                    self.flagged_urls[clean_url(line)] = 1
+                    if len(self.flagged_urls) > 500:
+                        self.flagged_urls.popitem(last=False)
                     self.lock.release()
                 url_flag = 0
 
     def found_redirect(self, url):
         url = clean_url(url)
-        if url in self.flagged_urls:
+        self.lock.acquire()
+        if url in self.flagged_urls.keys():
             found = True
-            self.flagged_urls.remove(url)
         else:
             found = False
+        self.lock.release()
         return found
 
-    def clear_urls(self):
-        del self.flagged_urls[:]

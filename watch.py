@@ -5,6 +5,7 @@ import os
 import glob
 import logging
 import threading
+import time
 
 from lxml import etree
 
@@ -67,7 +68,6 @@ def find_unapplied_rules():
     theUrls = sniffedUrls(interface)
     for plainUrl in theUrls:
         try:
-            ff.lock.acquire()
             ruleMatch = trie.transformUrl(plainUrl)
             transformedUrl = ruleMatch.url
             if plainUrl == transformedUrl:
@@ -79,9 +79,6 @@ def find_unapplied_rules():
                 print "BAD: %s should have been transformed to %s" % (plainUrl, transformedUrl)
         except Exception, e:
             sys.stderr.write("%s\n" % e)
-        finally:
-            print ff.flagged_urls
-            ff.lock.release()
 
 # start a Firefox instance with the given profile
 ff = Firefox(profiledir)
