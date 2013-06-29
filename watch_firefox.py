@@ -4,6 +4,11 @@ import subprocess
 import os
 import threading
 
+def clean_url(url):
+    """Remove whitespace, ignore page anchors"""
+    parts = url.strip().split('#')
+    return parts[0]
+
 class Firefox:
 
     def __init__(self, profiledir=None):
@@ -35,13 +40,15 @@ class Firefox:
             else:
                 if url_flag == 1:
                     self.lock.acquire()
-                    self.flagged_urls.append(line.strip())
+                    self.flagged_urls.append(clean_url(line))
                     self.lock.release()
                 url_flag = 0
 
     def found_redirect(self, url):
+        url = clean_url(url)
         if url in self.flagged_urls:
             found = True
+            self.flagged_urls.remove(url)
         else:
             found = False
         return found

@@ -37,7 +37,8 @@ else:
     sys.stderr.write("using default interface wlan0\n")
 
 def alert():
-    os.system("play /usr/share/gnome-games/sounds/crash.ogg")
+    #os.system("play /usr/share/gnome-games/sounds/crash.ogg")
+    os.system("canberra-gtk-play --file /usr/share/sounds/gnome/default/alerts/sonar.ogg") # works on ubuntu
 
 defaultpath = "extensions/https-everywhere@eff.org/chrome/content/rules/default.rulesets"
 # ruledir = "./rules"
@@ -79,6 +80,7 @@ def find_unapplied_rules():
         except Exception, e:
             sys.stderr.write("%s\n" % e)
         finally:
+            print ff.flagged_urls
             ff.lock.release()
 
 # start a Firefox instance with the given profile
